@@ -89,5 +89,4 @@ func main() {
 	}
 
 	fmt.Println("decrypted message:\n", string(decryptoData))
-
 }
