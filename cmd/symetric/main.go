@@ -1,51 +1,17 @@
 package main
 
 import (
-	"crypto/rand"
 	"encoding/hex"
-	"errors"
 	"fmt"
-	"io"
 
+	"github.com/jcbritobr/cryptoexamples/cryptoutils"
 	"golang.org/x/crypto/nacl/secretbox"
 )
 
-const (
-	keySize   = 32
-	nonceSize = 24
-)
-
-var (
-	errEncrypt = errors.New("secret: encryption failed")
-	errDecrypt = errors.New("secret: decryption failed")
-)
-
-// generateKey creates a new random secret key
-func generateKey() (*[keySize]byte, error) {
-	key := new([keySize]byte)
-	_, err := io.ReadFull(rand.Reader, key[:])
+func encrypt(key *[cryptoutils.KeySize]byte, message []byte) ([]byte, error) {
+	nonce, err := cryptoutils.GenerateNonce()
 	if err != nil {
-		return nil, err
-	}
-
-	return key, nil
-}
-
-// generateNonce creates a new random nonce
-func generateNonce() (*[nonceSize]byte, error) {
-	nonce := new([nonceSize]byte)
-	_, err := io.ReadFull(rand.Reader, nonce[:])
-	if err != nil {
-		return nil, err
-	}
-
-	return nonce, nil
-}
-
-func encrypt(key *[keySize]byte, message []byte) ([]byte, error) {
-	nonce, err := generateNonce()
-	if err != nil {
-		return nil, errEncrypt
+		return nil, cryptoutils.ErrEncrypt
 	}
 	out := make([]byte, len(nonce))
 	copy(out, nonce[:])
@@ -53,23 +19,23 @@ func encrypt(key *[keySize]byte, message []byte) ([]byte, error) {
 	return out, nil
 }
 
-func decrypt(key *[keySize]byte, message []byte) ([]byte, error) {
-	if len(message) < (nonceSize + secretbox.Overhead) {
-		return nil, errDecrypt
+func decrypt(key *[cryptoutils.KeySize]byte, message []byte) ([]byte, error) {
+	if len(message) < (cryptoutils.NonceSize + secretbox.Overhead) {
+		return nil, cryptoutils.ErrDecrypt
 	}
 
-	var nonce [nonceSize]byte
-	copy(nonce[:], message[:nonceSize])
-	out, ok := secretbox.Open(nil, message[nonceSize:], &nonce, key)
+	var nonce [cryptoutils.NonceSize]byte
+	copy(nonce[:], message[:cryptoutils.NonceSize])
+	out, ok := secretbox.Open(nil, message[cryptoutils.NonceSize:], &nonce, key)
 	if !ok {
-		return nil, errDecrypt
+		return nil, cryptoutils.ErrDecrypt
 	}
 	return out, nil
 }
 
 func main() {
 	fmt.Println("Generating key")
-	key, err := generateKey()
+	key, err := cryptoutils.GenerateKey()
 	if err != nil {
 		panic(err)
 	}
