@@ -7,5 +7,10 @@ This study is based on [Golang Cryptography for Depeloper](https://leanpub.com/c
 $ go test ./... -v
 ```
 
-* [Symetric nacl example](cmd/nacl/nacl.go)  example with **confidentiality** and **authenticity(MAC)** algorithm. \
-The cipher XSalsa20 is checked against a mac called Poly1305 to assure the authenticity of the source.
+* Symetric nacl example
+
+# References
+* [Golang Cryptography for Depeloper](https://leanpub.com/cryptog)
+* [Go Cryptography](https://www.amazon.com/Go-Cryptography-Anish-Nath/dp/1790681073)
+* [An article aboout NACL](https://en.wikipedia.org/wiki/NaCl_(software))
+* [NaCl: Networking and Cryptography library](https://nacl.cr.yp.to/)
